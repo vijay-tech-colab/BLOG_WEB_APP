@@ -1,0 +1,176 @@
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
+
+const API_URL = 'http://localhost:5000/api/v1/auth';
+
+// Login
+export const loginUser = createAsyncThunk('auth/login', async (payload, { rejectWithValue }) => {
+  try {
+    const res = await axios.post(`${API_URL}/login`, payload, { withCredentials: true });
+    return res.data;
+  } catch (err) {
+    return rejectWithValue(err.response?.data?.message || err.message);
+  }
+});
+
+// Register
+export const registerUser = createAsyncThunk('auth/register', async (payload, { rejectWithValue }) => {
+  try {
+    const res = await axios.post(`${API_URL}/register`, payload, { withCredentials: true });
+    return res.data;
+  } catch (err) {
+    return rejectWithValue(err.response?.data?.message || err.message);
+  }
+});
+
+// Profile
+export const getProfile = createAsyncThunk('auth/profile', async (_, { rejectWithValue }) => {
+  try {
+    const res = await axios.get(`${API_URL}/profile`, { withCredentials: true });
+    return res.data;
+  } catch (err) {
+    return rejectWithValue(err.response?.data?.message || err.message);
+  }
+});
+
+// Logout
+export const logoutUser = createAsyncThunk('auth/logout', async (_, { rejectWithValue }) => {
+  try {
+    const res = await axios.get(`${API_URL}/logout`, { withCredentials: true });
+    return res.data;
+  } catch (err) {
+    return rejectWithValue(err.response?.data?.message || err.message);
+  }
+});
+
+export const updateUser = createAsyncThunk('auth/update', async (payload, { rejectWithValue }) => {
+  try {
+    const res = await axios.put(`${API_URL}/update`, payload,{ withCredentials: true });
+    return res.data;
+  } catch (err) {
+    return rejectWithValue(err.response?.data?.message || err.message);
+  }
+});
+
+export const updatePassword = createAsyncThunk('auth/change-password', async (payload, { rejectWithValue }) => {
+  try {
+    const res = await axios.put(`${API_URL}/change-password`, payload,{ withCredentials: true });
+    return res.data;
+  } catch (err) {
+    return rejectWithValue(err.response?.data?.message || err.message);
+  }
+});
+
+const userSlice = createSlice({
+  name: "user",
+  initialState: {
+    loading: false,
+    error: null,
+    message: null,
+    user: null,
+  },
+  reducers: {
+    clearMessage: (state) => {
+      state.message = null;
+    },
+    clearError: (state) => {
+      state.error = null;
+    }
+  },
+  extraReducers: (builder) => {
+    // Login
+    builder.addCase(loginUser.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(loginUser.fulfilled, (state, action) => {
+      state.loading = false;
+      state.user = action.payload.user || action.payload.data?.user;
+      state.message = action.payload.message;
+    });
+    builder.addCase(loginUser.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+
+    // Register
+    builder.addCase(registerUser.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(registerUser.fulfilled, (state, action) => {
+      state.loading = false;
+      state.user = action.payload.user || action.payload.data?.user;
+      state.message = action.payload.message;
+    });
+    builder.addCase(registerUser.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+
+    // Get Profile
+    builder.addCase(getProfile.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(getProfile.fulfilled, (state, action) => {
+      state.loading = false;
+      state.user = action.payload.user || action.payload.data?.user;
+      state.message = action.payload.message;
+    });
+    builder.addCase(getProfile.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+
+    // Logout
+    builder.addCase(logoutUser.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(logoutUser.fulfilled, (state, action) => {
+      state.loading = false;
+      state.user = null;
+      state.message = action.payload.message;
+    });
+    builder.addCase(logoutUser.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+
+    builder.addCase(updateUser.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+
+    builder.addCase(updateUser.fulfilled, (state, action) => {
+      state.loading = false;
+      state.user = action.payload.data?.user;
+      state.message = action.payload.message;
+    });
+    builder.addCase(updateUser.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+
+    builder.addCase(updatePassword.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+
+    builder.addCase(updatePassword.fulfilled, (state, action) => {
+      state.loading = false;
+      console.log(action.payload);
+      state.user = action.payload.data?.user;
+      state.message = action.payload.message;
+    });
+    builder.addCase(updatePassword.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+  }
+});
+
+export const { clearMessage, clearError } = userSlice.actions;
+
+export default userSlice.reducer;

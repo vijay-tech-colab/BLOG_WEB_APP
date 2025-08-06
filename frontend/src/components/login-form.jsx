@@ -10,8 +10,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {loginUser } from "@/store/slices/userSlice";
+import { Navigate, useNavigate } from "react-router-dom";
+
 
 export function LoginForm({ className, ...props }) {
+  const disPatch = useDispatch();
+  const navigate = useNavigate();
+  const { user } = useSelector((state) => state.user);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -20,12 +27,14 @@ export function LoginForm({ className, ...props }) {
   const handleChange = (e) => {
     const name = e.target.name;
     const value = e.target.value;
-    setFormData((pre) => ({...pre , [name] : value}));
+    setFormData((pre) => ({ ...pre, [name]: value }));
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
-  }
+    disPatch(loginUser(formData));
+    navigate("/admin");
+  };
+  if (user) return <Navigate to="/" />;
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="bg-neumorphism ">

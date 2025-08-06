@@ -1,21 +1,137 @@
-import { LoginForm } from "@/components/login-form";
+// App.jsx
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { clearError, clearMessage, getProfile } from "./store/slices/userSlice";
+import LoginSection from "./pages/LoginSection";
+import AdminDashboard from "./pages/AdminDashboard";
+import ProtectedRoute from "./pages/ProtectedRoutes";
+import AuthorDashboard from "./pages/AuthorDashboard";
+import BlogPage from "./pages/BlogPage";
+import Profile from "./components/sub-components/Profile";
+import AdminMainSection from "./pages/AdminMainSection";
+import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
+import AnalyticsDashboard from "./pages/AnalyticsDashboard";
 
 export default function App() {
-  return (
-    <div className="relative bg-gradient-soft flex min-h-svh w-full items-center justify-center p-6 md:p-10 flex-col md:flex-row gap-10 h-[100vh]">
-      {/* Image above form on small screens, beside on large */}
-      <div className="relative w-full max-w-lg flex justify-center items-center md:order-1 -mb-5 sm:mb-0 z-10">
-        <img
-          src="/images/login-girl.png"
-          alt="Login Illustration"
-          className="w-[300px] sm:w-[400px] md:w-[500px] object-contain drop-shadow-xl"
-        />
-      </div>
+  const dispatch = useDispatch();
+  const { user, message, error } = useSelector((state) => state.user);
 
-      {/* Login Form (visually behind image on small screens) */}
-      <div className="relative z-0 w-full max-w-sm mt-[-40px] sm:mt-0">
-        <LoginForm />
-      </div>
-    </div>
+  useEffect(() => {
+    dispatch(getProfile());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (message) {
+      toast.success(message);
+      const timeout = setTimeout(() => {
+        dispatch(clearMessage());
+      }, 1000);
+      return () => clearTimeout(timeout);
+    }
+  }, [message, dispatch]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      const timeout = setTimeout(() => {
+        dispatch(clearError());
+      }, 1000);
+      return () => clearTimeout(timeout);
+    }
+  }, [error, dispatch]);
+
+  return (
+    <BrowserRouter>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          className:
+            "bg-gradient-to-r from-[#a1c4fd] to-[#c2e9fb] text-black shadow-lg border border-yellow-300",
+        }}
+      />
+      <Routes>
+        <Route path="/login" element={<LoginSection />} />
+
+        {/* Role-based Routes */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminDashboard>
+                <AdminMainSection />
+              </AdminDashboard>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/profile"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminDashboard>
+                <Profile />
+              </AdminDashboard>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/create-new-admin"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminDashboard>
+                <Profile />
+              </AdminDashboard>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+
+          path="/admin/alalystics"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminDashboard>
+                <AnalyticsDashboard />
+              </AdminDashboard>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/author"
+          element={
+            <ProtectedRoute role="author">
+              <AuthorDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/blog"
+          element={
+            <ProtectedRoute role="user">
+              <BlogPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Role-based redirect from "/" */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              {user?.role === "admin" ? (
+                <Navigate to="/admin" />
+              ) : user?.role === "author" ? (
+                <Navigate to="/author" />
+              ) : (
+                <Navigate to="/blog" />
+              )}
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="/unauthorized" element={<div>Access Denied</div>} />
+      </Routes>
+    </BrowserRouter>
   );
 }

@@ -4,12 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start" : "SET NODE_ENV=development& nodemon server.js",
+    "prod_start" : "SET NODE_ENV=production& nodemon server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.7.0",
