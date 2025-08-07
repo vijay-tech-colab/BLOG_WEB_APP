@@ -13,6 +13,8 @@ import AdminMainSection from "./pages/AdminMainSection";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import AnalyticsDashboard from "./pages/AnalyticsDashboard";
+import ForgotPasswordPage from "./pages/ForgotPassord";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 export default function App() {
   const dispatch = useDispatch();
@@ -53,7 +55,8 @@ export default function App() {
       />
       <Routes>
         <Route path="/login" element={<LoginSection />} />
-
+         <Route path="/forgot-password" element={<ForgotPasswordPage/>} />
+         <Route path="/reset-password/:token" element={<ResetPasswordPage/>} />
         {/* Role-based Routes */}
         <Route
           path="/admin"
@@ -88,7 +91,7 @@ export default function App() {
         
         <Route
 
-          path="/admin/alalystics"
+          path="/admin/analytics"
           element={
             <ProtectedRoute role="admin">
               <AdminDashboard>

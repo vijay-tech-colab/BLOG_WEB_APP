@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -23,15 +24,19 @@ const userSchema = new mongoose.Schema(
       minlength: [6, "Password must be at least 6 characters long"],
     },
     avatar: {
-    public_id: {
-      type: String,
-      required: true,
+      public_id: {
+        type: String,
+        required: true,
+      },
+      url: {
+        type: String,
+        required: true,
+      },
     },
-    url: {
-      type: String,
-      required: true,
+    isBlock :{
+      type : Boolean,
+      default : false
     },
-  },
     bio: {
       type: String,
       maxlength: [200, "Bio must not exceed 200 characters"],
@@ -43,7 +48,9 @@ const userSchema = new mongoose.Schema(
         message: "Role must be either 'reader', 'author', or 'admin'",
       },
       default: "reader",
-    }
+    },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
   },
   {
     timestamps: true,
@@ -67,6 +74,18 @@ userSchema.methods.generateJwtToken = function () {
     expiresIn: process.env.JWT_EXPIRE,
   });
 };
+
+userSchema.methods.generateResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  this.resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  this.resetPasswordExpire = Date.now() + 10 * 60 * 1000
+  return resetToken;
+};
+
 const User = mongoose.model("User", userSchema);
 
 export default User;

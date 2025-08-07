@@ -27,7 +27,10 @@ export default function ChangePassword() {
   };
   const handleSubmit = () => {
     disPatch(updatePassword(password));
-    <Navigate to={"/admin"} />;
+    setPassword({
+      oldPassword: "",
+      newPassword: "",
+    });
   };
   return (
     <Dialog>
@@ -51,6 +54,8 @@ export default function ChangePassword() {
                 name="oldPassword"
                 onChange={handleChangePassword}
                 type="password"
+                autoComplete="off"
+                value={password.oldPassword}
               />
             </div>
             <div className="grid gap-3">
@@ -60,6 +65,8 @@ export default function ChangePassword() {
                 name="newPassword"
                 onChange={handleChangePassword}
                 type="password"
+                autoComplete="off"
+                value={password.newPassword}
               />
             </div>
           </div>

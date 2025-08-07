@@ -43,18 +43,40 @@ export const logoutUser = createAsyncThunk('auth/logout', async (_, { rejectWith
   }
 });
 
+// Update user
 export const updateUser = createAsyncThunk('auth/update', async (payload, { rejectWithValue }) => {
   try {
-    const res = await axios.put(`${API_URL}/update`, payload,{ withCredentials: true });
+    const res = await axios.put(`${API_URL}/update`, payload, { withCredentials: true });
     return res.data;
   } catch (err) {
     return rejectWithValue(err.response?.data?.message || err.message);
   }
 });
 
+// Change password
 export const updatePassword = createAsyncThunk('auth/change-password', async (payload, { rejectWithValue }) => {
   try {
-    const res = await axios.put(`${API_URL}/change-password`, payload,{ withCredentials: true });
+    const res = await axios.put(`${API_URL}/change-password`, payload, { withCredentials: true });
+    return res.data;
+  } catch (err) {
+    return rejectWithValue(err.response?.data?.message || err.message);
+  }
+});
+
+// Forgot password
+export const forgotPassword = createAsyncThunk('auth/forgot-password', async (payload, { rejectWithValue }) => {
+  try {
+    const res = await axios.post(`${API_URL}/forgot-password`, payload, { withCredentials: true });
+    return res.data;
+  } catch (err) {
+    return rejectWithValue(err.response?.data?.message || err.message);
+  }
+});
+
+// Reset password
+export const resetPassword = createAsyncThunk('auth/reset-password', async ({ token, payload }, { rejectWithValue }) => {
+  try {
+    const res = await axios.put(`${API_URL}/reset-password/${token}`, payload, { withCredentials: true });
     return res.data;
   } catch (err) {
     return rejectWithValue(err.response?.data?.message || err.message);
@@ -68,6 +90,7 @@ const userSlice = createSlice({
     error: null,
     message: null,
     user: null,
+    isAuthenticated: false,
   },
   reducers: {
     clearMessage: (state) => {
@@ -78,99 +101,132 @@ const userSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    // Login
-    builder.addCase(loginUser.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
-    builder.addCase(loginUser.fulfilled, (state, action) => {
-      state.loading = false;
-      state.user = action.payload.user || action.payload.data?.user;
-      state.message = action.payload.message;
-    });
-    builder.addCase(loginUser.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    });
+    builder
+      // Login
+      .addCase(loginUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload?.data?.user || action.payload?.user;
+        state.isAuthenticated = true;
+        state.message = action.payload.message;
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.isAuthenticated = false;
+      })
 
-    // Register
-    builder.addCase(registerUser.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
-    builder.addCase(registerUser.fulfilled, (state, action) => {
-      state.loading = false;
-      state.user = action.payload.user || action.payload.data?.user;
-      state.message = action.payload.message;
-    });
-    builder.addCase(registerUser.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    });
+      // Register
+      .addCase(registerUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload?.data?.user || action.payload?.user;
+        state.isAuthenticated = true;
+        state.message = action.payload.message;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.isAuthenticated = false;
+      })
 
-    // Get Profile
-    builder.addCase(getProfile.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
-    builder.addCase(getProfile.fulfilled, (state, action) => {
-      state.loading = false;
-      state.user = action.payload.user || action.payload.data?.user;
-      state.message = action.payload.message;
-    });
-    builder.addCase(getProfile.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    });
+      // Profile
+      .addCase(getProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload?.data?.user || action.payload?.user;
+        state.isAuthenticated = true;
+        state.message = action.payload.message;
+      })
+      .addCase(getProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.isAuthenticated = false;
+      })
 
-    // Logout
-    builder.addCase(logoutUser.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
-    builder.addCase(logoutUser.fulfilled, (state, action) => {
-      state.loading = false;
-      state.user = null;
-      state.message = action.payload.message;
-    });
-    builder.addCase(logoutUser.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    });
+      // Logout
+      .addCase(logoutUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(logoutUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+        state.message = action.payload.message;
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 
-    builder.addCase(updateUser.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
+      // Update user
+      .addCase(updateUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload?.data?.user;
+        state.message = action.payload.message;
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 
-    builder.addCase(updateUser.fulfilled, (state, action) => {
-      state.loading = false;
-      state.user = action.payload.data?.user;
-      state.message = action.payload.message;
-    });
-    builder.addCase(updateUser.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    });
+      // Update password
+      .addCase(updatePassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updatePassword.fulfilled, (state, action) => {
+        state.loading = false;
+        state.message = action.payload.message;
+      })
+      .addCase(updatePassword.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 
-    builder.addCase(updatePassword.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
+      // Forgot password
+      .addCase(forgotPassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(forgotPassword.fulfilled, (state, action) => {
+        state.loading = false;
+        state.message = action.payload.message;
+      })
+      .addCase(forgotPassword.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 
-    builder.addCase(updatePassword.fulfilled, (state, action) => {
-      state.loading = false;
-      console.log(action.payload);
-      state.user = action.payload.data?.user;
-      state.message = action.payload.message;
-    });
-    builder.addCase(updatePassword.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    });
+      // Reset password
+      .addCase(resetPassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(resetPassword.fulfilled, (state, action) => {
+        state.loading = false;
+        state.message = action.payload.message;
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   }
 });
 
 export const { clearMessage, clearError } = userSlice.actions;
-
 export default userSlice.reducer;

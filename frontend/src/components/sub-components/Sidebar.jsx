@@ -9,10 +9,20 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const { user } = useSelector((state) => state.user);
+
+  const links = [
+    { to: "/admin", icon: LayoutDashboard, label: "Dashboard" },
+    { to: "/admin/add-blog", icon: Plus, label: "Add Blog" },
+    { to: "/admin/all-blogs", icon: FileText, label: "All Blogs" },
+    { to: "/admin/messages", icon: MessageSquare, label: "Messages" },
+    { to: "/admin/analytics", icon: BarChart2, label: "Analytics" },
+    { to: "/admin/create-new-admin", icon: ShieldPlus, label: "New Admin" },
+  ];
+
   return (
     <aside
       className={`fixed md:relative bg-white w-64 h-screen p-4 shadow-lg z-30 top-0 left-0 transform transition-transform duration-300 ${
@@ -25,46 +35,31 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
           <X className="h-6 w-6" />
         </button>
       </div>
-      {/* <div className="hidden md:flex items-center justify-center mb-6">
-        <div>
-          <img
-            src={user.avatar.url}
-            alt=""
-            className="rounded-full w-30 h-30"
-          />
-        </div>
-      </div> */}
-      <nav className="space-y-4 ">
-        <Link to="/admin">
-          <Button variant="ghost" className="w-full justify-start mb-3">
-            <LayoutDashboard className="h-5 w-5 mr-2" /> Dashboard
-          </Button>
-        </Link>
-        <Link to="/admin">
-          <Button variant="ghost" className="w-full justify-start mb-3">
-            <Plus className="h-5 w-5 mr-2" /> Add Blog
-          </Button>
-        </Link>
-        <Link to="/admin">
-          <Button variant="ghost" className="w-full justify-start mb-3">
-            <FileText className="h-5 w-5 mr-2" /> All Blogs
-          </Button>
-        </Link>
-        <Link to="/admin">
-          <Button variant="ghost" className="w-full justify-start mb-3">
-            <MessageSquare className="h-5 w-5 mr-2" /> Messages
-          </Button>
-        </Link>
-        <Link to="/admin/alalystics">
-          <Button variant="ghost" className="w-full justify-start mb-3">
-            <BarChart2 className="h-5 w-5 mr-2" /> Analytics
-          </Button>
-        </Link>
-        <Link to="/admin/create-new-admin">
-          <Button variant="ghost" className="w-full justify-start mb-3">
-            <ShieldPlus className="h-5 w-5 mr-2" /> New Admin
-          </Button>
-        </Link>
+
+      {/* Uncomment if you want to show avatar
+      <div className="hidden md:flex items-center justify-center mb-6">
+        <img
+          src={user.avatar.url}
+          alt="avatar"
+          className="rounded-full w-24 h-24"
+        />
+      </div> 
+      */}
+
+      <nav className="space-y-1">
+        {links.map(({ to, icon: Icon, label }) => (
+          <NavLink key={to} to={to}>
+            {({ isActive }) => (
+              <Button
+                variant={isActive ? "default" : "ghost"}
+                className="w-full justify-start mb-2"
+              >
+                <Icon className="h-5 w-5 mr-2" />
+                {label}
+              </Button>
+            )}
+          </NavLink>
+        ))}
       </nav>
     </aside>
   );
