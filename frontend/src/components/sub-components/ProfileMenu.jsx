@@ -18,7 +18,7 @@ function ProfileMenu({ children }) {
       <DropdownMenuContent className="max-sm:mr-5 sm:mr-10">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <Link to="/admin/profile">
+        <Link to="/dashboard/profile">
           <DropdownMenuItem>Profile</DropdownMenuItem>
         </Link>
         <DropdownMenuItem

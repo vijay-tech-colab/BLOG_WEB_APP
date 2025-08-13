@@ -121,7 +121,7 @@ export default function Profile() {
           <Label>Role</Label>
           <Input
             name="role"
-            value={profile.role}
+            value={profile.role.toUpperCase()}
             disabled
             className="bg-muted text-muted-foreground cursor-not-allowed"
           />
@@ -158,7 +158,7 @@ export default function Profile() {
           </Button>
         ) : (
           <div className="">
-            <Link to="/admin">
+            <Link to="/dashboard">
               <Button className="w-full sm:w-auto">Back to Dashboard</Button>
             </Link>
           </div>

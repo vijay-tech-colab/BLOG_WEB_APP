@@ -1,26 +1,55 @@
+
 import mongoose from "mongoose";
+
 const commentSchema = new mongoose.Schema(
   {
-    post: {
+    blog: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "BlogPost",
+      ref: "Blog",
       required: true,
     },
-    author: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    content: { type: String, required: true, trim: true },
-    parent: {
+    text: {
+      type: String,
+      required: [true, "Comment cannot be empty"],
+      trim: true,
+      minlength: [1, "Comment must have at least 1 character"],
+      maxlength: [1000, "Comment cannot exceed 1000 characters"],
+    },
+    parentComment: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Comment",
+      ref: "Comment", // For replies
       default: null,
     },
+    likes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User", // Users who liked the comment
+      },
+    ],
   },
   { timestamps: true }
 );
 
+// Optional: Populate user info automatically
+commentSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "user",
+    select: "name avatar", // Adjust according to your user schema
+  });
+  next();
+});
+
 commentSchema.index({ post: 1 });
 
-export default Comment = mongoose.model("Comment", commentSchema);
+const Comment = mongoose.model("Comment", commentSchema);
+
+export default Comment;
+
+
+
+

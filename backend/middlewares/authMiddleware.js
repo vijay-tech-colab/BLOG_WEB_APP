@@ -1,14 +1,9 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import CustomErrorHandler from "../utils/errorHandler.js";
-import jwt from "jsonwebtoken";
-import User from "../models/User.js";
-import CustomErrorHandler from "../utils/errorHandler.js";
-
 const verifyToken = async (req, res, next) => {
   try {
     const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
-
     if (!token) {
       return next(
         new CustomErrorHandler("Unauthorized: No token provided", 401)

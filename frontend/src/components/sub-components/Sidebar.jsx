@@ -6,22 +6,46 @@ import {
   X,
   FileText,
   ShieldPlus,
+  Users,
+  Handshake,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
-
 function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const { user } = useSelector((state) => state.user);
 
-  const links = [
-    { to: "/admin", icon: LayoutDashboard, label: "Dashboard" },
-    { to: "/admin/add-blog", icon: Plus, label: "Add Blog" },
-    { to: "/admin/all-blogs", icon: FileText, label: "All Blogs" },
-    { to: "/admin/messages", icon: MessageSquare, label: "Messages" },
-    { to: "/admin/analytics", icon: BarChart2, label: "Analytics" },
-    { to: "/admin/create-new-admin", icon: ShieldPlus, label: "New Admin" },
-  ];
+  const links =
+    user.role === "admin"
+      ? [
+          { to: "/dashboard", icon: LayoutDashboard, label: "Admin Dashboard" },
+          {
+            to: "/dashboard/manage-blogs",
+            icon: Handshake,
+            label: "Manage Blogs",
+          },
+          { to: "/dashboard/messages", icon: MessageSquare, label: "Messages" },
+          { to: "/dashboard/analytics", icon: BarChart2, label: "Analytics" },
+          {
+            to: "/dashboard/create-new-admin",
+            icon: ShieldPlus,
+            label: "Manage Admin",
+          },
+          { to: "/dashboard/manage-users", icon: Users, label: "Manage Users" },
+        ]
+      : [
+          {
+            to: "/dashboard",
+            icon: LayoutDashboard,
+            label: "Author Dashboard",
+          },
+          {
+            to: "/dashboard/manage-blogs",
+            icon: Handshake,
+            label: "Manage Blogs",
+          },
+          { to: "/dashboard/messages", icon: MessageSquare, label: "Messages" },
+        ];
 
   return (
     <aside
@@ -48,7 +72,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
       <nav className="space-y-1">
         {links.map(({ to, icon: Icon, label }) => (
-          <NavLink key={to} to={to}>
+          <NavLink key={to} to={to} onClick={() => setSidebarOpen(false)}>
             {({ isActive }) => (
               <Button
                 variant={isActive ? "default" : "ghost"}

@@ -1,4 +1,4 @@
-export function resetPasswordMailOptions(toEmail, resetToken , req) {
+export function resetPasswordMailOptions(toEmail, resetToken) {
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
   return {

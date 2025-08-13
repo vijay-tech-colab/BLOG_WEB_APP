@@ -13,6 +13,7 @@ import {
   MessageSquare,
   Bell,
 } from "lucide-react";
+import GoDashboard from "@/components/sub-components/GoDashboard";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -50,8 +51,9 @@ const options = {
 
 export default function AnalyticsDashboard() {
   return (
-    <div className="p-4 space-y-6">
-      <h2 className="text-2xl font-semibold">Analytics Overview</h2>
+    <div className="p-4 space-y-6 relative">
+      <h2 className="text-2xl font-semibold">ANALYTICS OVERVIEW</h2>
+      
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {stats.map((item, i) => (
@@ -73,6 +75,8 @@ export default function AnalyticsDashboard() {
           <Bar data={data} options={options} />
         </CardContent>
       </Card>
+      <GoDashboard path="/admin">Go Dashboard</GoDashboard>
     </div>
+
   );
 }

@@ -17,7 +17,35 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useSelector } from "react-redux";
+import StatsCardWithChart from "@/components/sub-components/Statistics";
 function AdminMainSection() {
+  const { allUsers, user } = useSelector((state) => state.user);
+  const { allBlogs } = useSelector((state) => state.blog);
+  const { userMessages } = useSelector((state) => state.message);
+  // console.log(allBlogs);
+  const ALLUSERS = allUsers.reduce(
+    (acc, curr) => {
+      if (curr.role === "admin") {
+        acc.admin = acc.admin + 1;
+      } else if (curr.role === "author") {
+        acc.author = acc.author + 1;
+      }
+      return acc
+    },
+    {
+      admin: 0,
+      author: 0,
+    }
+  );
+  const data = {
+    users: allUsers?.length,
+    admins: ALLUSERS.admin?.length,
+    blogs: allBlogs?.length,
+    messages: userMessages?.length,
+    comments: 10,
+    authors: ALLUSERS.author?.length
+  }
   return (
     <div>
       {" "}
@@ -28,7 +56,7 @@ function AdminMainSection() {
             <Users className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,245</div>
+            <div className="text-2xl font-bold">{allUsers.length}</div>
             <p className="text-sm text-muted-foreground">Active this month</p>
           </CardContent>
         </Card>
@@ -39,7 +67,7 @@ function AdminMainSection() {
             <PenLine className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">87</div>
+            <div className="text-2xl font-bold">{ALLUSERS.author}</div>
             <p className="text-sm text-muted-foreground">Publishing blogs</p>
           </CardContent>
         </Card>
@@ -50,7 +78,7 @@ function AdminMainSection() {
             <UserCog className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">4</div>
+            <div className="text-2xl font-bold">{ALLUSERS.admin}</div>
             <p className="text-sm text-muted-foreground">Team managers</p>
           </CardContent>
         </Card>
@@ -61,7 +89,7 @@ function AdminMainSection() {
             <FileText className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">653</div>
+            <div className="text-2xl font-bold">{allBlogs?.length}</div>
             <p className="text-sm text-muted-foreground">Published</p>
           </CardContent>
         </Card>
@@ -74,6 +102,16 @@ function AdminMainSection() {
           <CardContent>
             <div className="text-2xl font-bold">2,341</div>
             <p className="text-sm text-muted-foreground">User feedbacks</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Message</CardTitle>
+            <MessageSquare className="h-5 w-5 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{userMessages?.length}</div>
+            <p className="text-sm text-muted-foreground">User message</p>
           </CardContent>
         </Card>
       </div>
@@ -99,16 +137,7 @@ function AdminMainSection() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Send Notification</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Input placeholder="Notification Title" />
-            <Textarea placeholder="Write your message..." />
-            <Button className="w-full">Send</Button>
-          </CardContent>
-        </Card>
+        <StatsCardWithChart data={data}/>
       </div>
     </div>
   );

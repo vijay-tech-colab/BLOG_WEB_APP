@@ -23,7 +23,7 @@ export default function AdminDashboard({ children }) {
         <Header setSidebarOpen={setSidebarOpen} />
 
         {/* Scrollable content */}
-        <main className="flex-1 overflow-y-auto  md:px-8 max-sm:py-20 sm:py-15">
+        <main className="flex-1 overflow-y-auto  md:px-8 max-sm:py-20 sm:py-15 px-4">
           {children}
         </main>
       </div>

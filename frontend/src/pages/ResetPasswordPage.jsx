@@ -1,4 +1,3 @@
-// src/pages/ResetPasswordPage.jsx
 
 import React, { useState } from "react";
 import { Loader2Icon, Lock } from "lucide-react";

@@ -251,10 +251,12 @@ export const resetPassword = catchAsyncHandler(async (req, res, next) => {
   });
 });
 
-
 export const toggleUserBlock = catchAsyncHandler(async (req, res, next) => {
   const { id } = req.params;
 
+  if (req.user.id === req.params.id) {
+    return next(new CustomErrorHandler("You cannot block yourself", 400));
+  }
   // Find the user first
   const user = await User.findById(id);
   if (!user) {
@@ -263,12 +265,12 @@ export const toggleUserBlock = catchAsyncHandler(async (req, res, next) => {
 
   // Toggle the isBlock status
   user.isBlock = !user.isBlock;
-  await user.save({ validateBeforeSave: true });
+  await user.save({ validateBeforeSave: false });
 
   res.status(200).json({
     success: true,
     message: `User has been ${user.isBlock ? "blocked" : "unblocked"} successfully`,
-    data : {user},
+    data: { user },
   });
 });
 
@@ -282,8 +284,66 @@ export const getAllUsers = catchAsyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "All users fetched successfully",
-    data: { user : users },
+    data: { user: users },
   });
 });
 
+export const createAdmin = catchAsyncHandler(async (req, res, next) => {
+  const { name, email, password } = req.body;
 
+  // 1️⃣ Validate input
+  if (!name || !email || !password) {
+    return next(
+      new CustomErrorHandler("Name, email, and password are required", 400)
+    );
+  }
+
+  // 4️⃣ Create new admin
+  const newAdmin = User({
+    name,
+    email,
+    password,
+    role: "admin",
+  });
+  await newAdmin.save({ validateBeforeSave: false });
+
+  // 5️⃣ Send response
+  res.status(201).json({
+    success: true,
+    message: "Admin created successfully",
+    data: {
+      id: newAdmin._id,
+      name: newAdmin.name,
+      email: newAdmin.email,
+      role: newAdmin.role,
+    },
+  });
+});
+
+export const accountDelete = catchAsyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+
+  if (req.user.id === req.params.id) {
+    return next(new CustomErrorHandler("You cannot delete your own account", 400));
+  }
+  const user = await User.findById(id);
+  if (!user) {
+    return next(new CustomErrorHandler("User not found", 404));
+  }
+
+  // Delete avatar from cloudinary
+
+  if (user.avatar?.public_id) {
+    await ImageOperation.deleteImage(user.avatar.public_id);
+  }
+  // Delete user from DB
+  await user.deleteOne();
+
+  res.status(200).json({
+    success: true,
+    data: {
+      user: { _id: id }, // send only id to frontend
+    },
+    message: "Account deleted successfully",
+  });
+});

@@ -18,7 +18,7 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 export function LoginForm({ className, ...props }) {
   const disPatch = useDispatch();
   const navigate = useNavigate();
-  const { user } = useSelector((state) => state.user);
+  const { user , } = useSelector((state) => state.user);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -32,7 +32,6 @@ export function LoginForm({ className, ...props }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     disPatch(loginUser(formData));
-    navigate("/admin");
   };
   if (user) return <Navigate to="/" />;
   return (
@@ -88,9 +87,9 @@ export function LoginForm({ className, ...props }) {
             </div>
             <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}
-              <a href="#" className="underline underline-offset-4">
+              <Link to="/register" className="underline underline-offset-4">
                 Sign up
-              </a>
+              </Link>
             </div>
           </form>
         </CardContent>

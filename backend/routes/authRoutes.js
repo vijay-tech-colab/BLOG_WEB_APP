@@ -1,6 +1,8 @@
 import express from "express";
 import {
+  accountDelete,
   changePassword,
+  createAdmin,
   forgotPassword,
   getAllUsers,
   getProfile,
@@ -24,9 +26,18 @@ authRouter.route("/change-password").put(verifyToken, changePassword);
 authRouter.route("/forgot-password").post(forgotPassword);
 authRouter.route("/reset-password/:token").put(resetPassword);
 authRouter
+  .route("/create-admin")
+  .post(verifyToken, restrict("admin"), createAdmin);
+
+authRouter
   .route("/block/:id")
   .put(verifyToken, restrict("admin"), toggleUserBlock);
+
 authRouter
   .route("/get-all-users")
-  .get(verifyToken, restrict("admin", "auther"), getAllUsers);
+  .get(verifyToken, restrict("admin", "author"), getAllUsers);
+
+authRouter
+  .route("/delete-account/:id")
+  .delete(verifyToken, restrict("admin"), accountDelete)
 export default authRouter;
