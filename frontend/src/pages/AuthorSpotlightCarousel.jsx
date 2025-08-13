@@ -16,7 +16,7 @@ export default function AuthorSpotlightCarousel() {
     async function fetchTeam() {
       try {
         const { data } = await axios.get(
-          "http://localhost:5000/api/v1/user/team",
+          `${import.meta.env.VITE_API_URL}/api/v1/user/team`,
           { withCredentials: true }
         );
         setTeam(data.data);

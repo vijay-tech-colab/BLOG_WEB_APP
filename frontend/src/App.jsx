@@ -29,6 +29,8 @@ import AboutSection from "./components/sub-components/aboutBlog";
 import ContactPage from "./pages/blogContact";
 import Register from "./components/sub-components/Register";
 import ViewProfile from "./pages/ViewProfile";
+import NotFound from "./components/sub-components/NotFound";
+
 export default function App() {
   const dispatch = useDispatch();
 const { user, message, error } = useSelector((state) => state.user);
@@ -251,12 +253,8 @@ useEffect(() => {
             </ProtectedRoute>
           }
         />
-        
-
-        
-        
-
         <Route path="/unauthorized" element={<div>Access Denied</div>} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
