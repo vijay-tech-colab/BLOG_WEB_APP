@@ -16,7 +16,7 @@ export default function ViewProfile() {
   useEffect(() => {
     async function fetchUser() {
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/v1/user/team/${id}`, { withCredentials: true })
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/user/team/${id}`, { withCredentials: true })
         setUser(data.data)
         setLoading(false)
       } catch (err) {

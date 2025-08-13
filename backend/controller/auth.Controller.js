@@ -50,8 +50,9 @@ export const signUp = catchAsyncHandler(async (req, res, next) => {
     .status(201)
     .cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      secure: true,
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 day
     })
     .json({
       success: true,
@@ -79,7 +80,7 @@ export const signIn = catchAsyncHandler(async (req, res, next) => {
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 day
     })
     .json({
       success: true,
@@ -108,7 +109,8 @@ export const logoutUser = catchAsyncHandler(async (req, res, next) => {
     .status(200)
     .cookie("token", "", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
+      sameSite : "none",
       maxAge: 0, // 1 day
     })
     .json({

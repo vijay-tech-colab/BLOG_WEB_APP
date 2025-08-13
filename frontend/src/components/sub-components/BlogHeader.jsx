@@ -1,22 +1,28 @@
-
-
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Sun, Home, Info, BookOpen, Mail } from "lucide-react";
+import { Menu, Sun, Home, Info, BookOpen, Mail, LogOut } from "lucide-react";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutUser } from "@/store/slices/userSlice";
 
 export default function Header() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const {message} = useSelector(state => state.user);
+
 
   useEffect(() => {
     (async () => {
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/v1/subscriber/check-subscription`,
+          `${
+            import.meta.env.VITE_API_URL
+          }/api/v1/subscriber/check-subscription`,
           { withCredentials: true }
         );
         setIsSubscribed(res.data.isSubscribe);
@@ -24,7 +30,7 @@ export default function Header() {
         // console.log(error);
       }
     })();
-  }, []); // <-- empty dependency to run once on mount
+  }, []);
 
   const handleSubscription = async () => {
     try {
@@ -35,12 +41,18 @@ export default function Header() {
       );
 
       if (res.data.success) {
-        setIsSubscribed(true); // UI update after successful subscription
+        setIsSubscribed(true);
       }
     } catch (error) {
-        // console.log(error)
+      // console.log(error);
     }
   };
+
+  const handleLogout = async () => {
+   dispatch(logoutUser()).unwrap();
+  };
+
+  console.log(message);
 
   const navLinks = [
     { to: "/", label: "Home", icon: <Home className="w-5 h-5" /> },
@@ -103,6 +115,15 @@ export default function Header() {
             {isSubscribed ? "Subscribed" : "Subscribe"}
           </Button>
 
+          {/* Logout (Desktop) */}
+          <Button
+            variant="outline"
+            className="hidden sm:inline-flex"
+            onClick={handleLogout}
+          >
+            Logout
+          </Button>
+
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
@@ -131,13 +152,25 @@ export default function Header() {
                     {link.label}
                   </Link>
                 ))}
+
                 <Button
                   disabled={isSubscribed}
                   size="lg"
                   className="mt-4 w-40"
                   onClick={handleSubscription}
                 >
-                  {isSubscribed ? "Subscribed"  : "Subscribe"}
+                  {isSubscribed ? "Subscribed" : "Subscribe"}
+                </Button>
+
+                {/* Logout (Mobile) */}
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="mt-4 w-40 flex items-center justify-center gap-2"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="w-5 h-5" />
+                  Logout
                 </Button>
               </motion.nav>
             </SheetContent>

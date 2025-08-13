@@ -11,14 +11,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {loginUser } from "@/store/slices/userSlice";
+import { loginUser } from "@/store/slices/userSlice";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-
+import { Loader2Icon } from "lucide-react";
 
 export function LoginForm({ className, ...props }) {
   const disPatch = useDispatch();
   const navigate = useNavigate();
-  const { user , } = useSelector((state) => state.user);
+  const { user , loading } = useSelector((state) => state.user);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -63,7 +63,7 @@ export function LoginForm({ className, ...props }) {
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
                   <Link
-                    to='/forgot-password'
+                    to="/forgot-password"
                     className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                   >
                     Forgot your password?
@@ -81,7 +81,14 @@ export function LoginForm({ className, ...props }) {
               </div>
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full" variant="outline">
-                  Login
+                  {loading ? (
+                    <>
+                      <Loader2Icon className="animate-spin mr-2 h-4 w-4" />
+                      Please wait...
+                    </>
+                  ) : (
+                    "Login"
+                  )}
                 </Button>
               </div>
             </div>
