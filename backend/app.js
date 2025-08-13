@@ -22,7 +22,6 @@ app.use(
   })
 );
 
-app.options("*", cors({ origin: ALLOWED, credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(
