@@ -6,8 +6,8 @@ import CustomErrorHandler from './errorHandler.js';
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'vijaykumar06232@gmail.com',
-    pass: 'jcpw hdnk wbqi umhu' // Use an App Password (not your Gmail password)
+    user: process.env.EMAIL,
+    pass: process.env.PASSWORD // Use an App Password (not your Gmail password)
   }
 });
 
