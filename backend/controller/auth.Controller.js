@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import ImageOperation from "../services/cloudinarySetup.js";
 import catchAsyncHandler from "../utils/catchAsyncHandler.js";
 import CustomErrorHandler from "../utils/errorHandler.js";
+import { enqueueEmailTask } from "../utils/rabbitmq.js";
 import { resetPasswordMailOptions } from "../utils/resetPasswordMailOptions.js";
 import sendMail from "../utils/sendEmail.js";
 import crypto from "crypto";
@@ -182,32 +183,43 @@ export const changePassword = catchAsyncHandler(async (req, res, next) => {
   });
 });
 
+
+
 export const forgotPassword = catchAsyncHandler(async (req, res, next) => {
   const { email } = req.body;
-  console.log(req.body);
+
+  // 🧩 1. Validate input
   if (!email) {
-    return next(
-      new CustomErrorHandler("Please provide an email address.", 400)
-    );
+    return next(new CustomErrorHandler("Please provide an email address.", 400));
   }
 
+  // 🧩 2. Check if user exists
   const user = await User.findOne({ email });
   if (!user) {
-    return next(new CustomErrorHandler("User not found", 404));
+    // (Optional) don't reveal existence of users for security
+    return next(new CustomErrorHandler("User not found.", 404));
   }
 
+  // 🧩 3. Generate reset token (your User model must have this method)
   const resetToken = user.generateResetToken();
+  await user.save({ validateBeforeSave: false }); // save token + expiry
 
-  await user.save({ validateBeforeSave: false });
-
+  // 🧩 4. Create mail options
   const mailOptions = resetPasswordMailOptions(user.email, resetToken, req);
+
+
   try {
-    await sendMail(mailOptions);
-    res.status(200).json({
+    // 🧩 5. Send mail
+    await enqueueEmailTask(mailOptions);
+
+    return res.status(200).json({
       success: true,
       message: `Password reset email sent to ${user.email}`,
     });
   } catch (error) {
+    console.error("❌ Email send failed:", error);
+
+    // Clean up token if email sending fails
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
     await user.save({ validateBeforeSave: false });
@@ -220,6 +232,7 @@ export const forgotPassword = catchAsyncHandler(async (req, res, next) => {
     );
   }
 });
+
 
 export const resetPassword = catchAsyncHandler(async (req, res, next) => {
   const resetToken = req.params.token;
