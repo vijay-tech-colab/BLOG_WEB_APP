@@ -4,7 +4,7 @@ import sendMail from "./sendEmail.js";
 
 
 
-const RABBITMQ_URL = process.env.RABBITMQ_URL 
+const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqps://owapqanv:FMfGDVWXcSMc_0T8-IMSH9UXegLRP6O6@duck.lmq.cloudamqp.com/owapqanv";
 const EXCHANGE = process.env.EXCHANGE || "email_exchange";
 const ROUTING_KEY = process.env.ROUTING_KEY || "send_email";
 const QUEUE = process.env.QUEUE || "email_queue";
